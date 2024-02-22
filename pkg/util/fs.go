@@ -1,6 +1,7 @@
 package util
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"io"
@@ -8,6 +9,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"text/template"
 )
 
 type FS interface {
@@ -15,7 +17,7 @@ type FS interface {
 	ReadFile(name string) ([]byte, error)
 }
 
-func ConvertFSToBytes(inFS FS, name string) ([][]byte, error) {
+func ConvertFSToBytes(inFS FS, name string, tmpl interface{}) ([][]byte, error) {
 	d, err := inFS.ReadDir(name)
 	if err != nil {
 		return nil, err
@@ -28,7 +30,18 @@ func ConvertFSToBytes(inFS FS, name string) ([][]byte, error) {
 		if err != nil {
 			return nil, err
 		}
-		rawResources = append(rawResources, rawResource)
+
+		t, err := template.New(path.Join(name, f.Name())).Parse(string(rawResource))
+		if err != nil {
+			return nil, err
+		}
+
+		returnedRawResource := bytes.Buffer{}
+		if err := t.Execute(&returnedRawResource, tmpl); err != nil {
+			return nil, err
+		}
+
+		rawResources = append(rawResources, returnedRawResource.Bytes())
 	}
 	return rawResources, nil
 }

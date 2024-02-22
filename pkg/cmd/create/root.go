@@ -19,6 +19,7 @@ import (
 var (
 	// Flags
 	recreateCluster   bool
+	port              string
 	buildName         string
 	kubeVersion       string
 	extraPortsMapping string
@@ -37,6 +38,7 @@ var CreateCmd = &cobra.Command{
 func init() {
 	CreateCmd.PersistentFlags().BoolVar(&recreateCluster, "recreate", false, "Delete cluster first if it already exists.")
 	CreateCmd.PersistentFlags().StringVar(&buildName, "build-name", "localdev", "Name for build (Prefix for kind cluster name, pod names, etc).")
+	CreateCmd.PersistentFlags().StringVar(&port, "port", "8443", "Port number under which idpBuilder tools are accessible.")
 	CreateCmd.PersistentFlags().StringVar(&kubeVersion, "kube-version", "v1.27.3", "Version of the kind kubernetes cluster to create.")
 	CreateCmd.PersistentFlags().StringVar(&extraPortsMapping, "extra-ports", "", "List of extra ports to expose on the docker container and kubernetes cluster as nodePort (e.g. \"22:32222,9090:39090,etc\").")
 	CreateCmd.PersistentFlags().StringVar(&kindConfigPath, "kind-config", "", "Path of the kind config file to be used instead of the default.")
@@ -78,14 +80,14 @@ func create(cmd *cobra.Command, args []string) error {
 		exitOnSync = !noExit
 	}
 
-	b := build.NewBuild(buildName, kubeVersion, kubeConfigPath, kindConfigPath, extraPortsMapping, absDirPaths, exitOnSync, k8s.GetScheme(), ctxCancel)
+	b := build.NewBuild(buildName, port, kubeVersion, kubeConfigPath, kindConfigPath, extraPortsMapping, absDirPaths, exitOnSync, k8s.GetScheme(), ctxCancel)
 
 	if err := b.Run(ctx, recreateCluster); err != nil {
 		return err
 	}
 
 	fmt.Print("\n\n########################### Finished Creating IDP Successfully! ############################\n\n\n")
-	fmt.Print("Can Access ArgoCD at https://argocd.cnoe.localtest.me:8443/\nUsername: admin\n")
+	fmt.Printf("Can Access ArgoCD at https://argocd.cnoe.localtest.me:%s/\nUsername: admin\n", port)
 	fmt.Print(`Password can be retrieved by running: kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d`, "\n")
 
 	return nil

@@ -1,12 +1,13 @@
 package kind
 
 import (
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestGetConfig(t *testing.T) {
-	cluster, err := NewCluster("testcase", "v1.26.3", "", "", "")
+	cluster, err := NewCluster("testcase", "8433", "v1.26.3", "", "", "")
 	if err != nil {
 		t.Fatalf("Initializing cluster resource: %v", err)
 	}
@@ -38,7 +39,7 @@ nodes:
 }
 
 func TestExtraPortMappings(t *testing.T) {
-	cluster, err := NewCluster("testcase", "v1.26.3", "", "", "22:32222")
+	cluster, err := NewCluster("testcase", "8443", "v1.26.3", "", "", "22:32222")
 	if err != nil {
 		t.Fatalf("Initializing cluster resource: %v", err)
 	}

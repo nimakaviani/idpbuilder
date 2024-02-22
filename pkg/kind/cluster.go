@@ -20,6 +20,7 @@ type Cluster struct {
 	kubeConfigPath    string
 	kindConfigPath    string
 	extraPortsMapping string
+	port              string
 }
 
 type PortMapping struct {
@@ -75,16 +76,18 @@ func (c *Cluster) getConfig() ([]byte, error) {
 	if err = template.Execute(&retBuff, struct {
 		KubernetesVersion string
 		ExtraPortsMapping []PortMapping
+		Port              string
 	}{
 		KubernetesVersion: c.kubeVersion,
 		ExtraPortsMapping: portMappingPairs,
+		Port:              c.port,
 	}); err != nil {
 		return []byte{}, err
 	}
 	return retBuff.Bytes(), nil
 }
 
-func NewCluster(name, kubeVersion, kubeConfigPath, kindConfigPath, extraPortsMapping string) (*Cluster, error) {
+func NewCluster(name, port, kubeVersion, kubeConfigPath, kindConfigPath, extraPortsMapping string) (*Cluster, error) {
 	provider := cluster.NewProvider(cluster.ProviderWithDocker())
 
 	return &Cluster{
@@ -93,6 +96,7 @@ func NewCluster(name, kubeVersion, kubeConfigPath, kindConfigPath, extraPortsMap
 		kindConfigPath:    kindConfigPath,
 		kubeVersion:       kubeVersion,
 		kubeConfigPath:    kubeConfigPath,
+		port:              port,
 		extraPortsMapping: extraPortsMapping,
 	}, nil
 }
