@@ -1,10 +1,8 @@
 package custompackage
 
 import (
-	"bytes"
 	"context"
 	"fmt"
-	"html/template"
 	"os"
 	"path/filepath"
 	"strings"
@@ -78,17 +76,12 @@ func (r *Reconciler) reconcileCustomPackage(ctx context.Context, resource *v1alp
 		return ctrl.Result{}, fmt.Errorf("reading file %s: %w", resource.Spec.ArgoCD.ApplicationFile, err)
 	}
 
-	t, err := template.New(resource.Namespace + "-" + resource.Name).Parse(string(b))
-	if err != nil {
+	var returnedRawResource []byte
+	if returnedRawResource, err = util.ApplyTemplate(b, r.Config); err != nil {
 		return ctrl.Result{}, err
 	}
 
-	returnedRawResource := bytes.Buffer{}
-	if err := t.Execute(&returnedRawResource, r.Config); err != nil {
-		return ctrl.Result{}, err
-	}
-
-	objs, err := k8s.ConvertYamlToObjects(r.Scheme, returnedRawResource.Bytes())
+	objs, err := k8s.ConvertYamlToObjects(r.Scheme, returnedRawResource)
 	if err != nil {
 		return ctrl.Result{}, fmt.Errorf("converting yaml to object %w", err)
 	}

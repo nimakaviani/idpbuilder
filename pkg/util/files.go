@@ -1,13 +1,15 @@
 package util
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 	"os"
 	"path/filepath"
+	"text/template"
 )
 
-func CopyDirectory(scrDir, dest string) error {
+func CopyDirectory(scrDir, dest string, template interface{}) error {
 	entries, err := os.ReadDir(scrDir)
 	if err != nil {
 		return err
@@ -26,13 +28,13 @@ func CopyDirectory(scrDir, dest string) error {
 			if err := CreateIfNotExists(destPath, 0755); err != nil {
 				return err
 			}
-			if err := CopyDirectory(sourcePath, destPath); err != nil {
+			if err := CopyDirectory(sourcePath, destPath, template); err != nil {
 				return err
 			}
 		case os.ModeSymlink:
 			continue
 		default:
-			if err := Copy(sourcePath, destPath); err != nil {
+			if err := Copy(sourcePath, destPath, template); err != nil {
 				return err
 			}
 		}
@@ -48,7 +50,7 @@ func CopyDirectory(scrDir, dest string) error {
 	return nil
 }
 
-func Copy(srcFile, dstFile string) error {
+func Copy(srcFile, dstFile string, tmpl interface{}) error {
 	out, err := os.Create(dstFile)
 	if err != nil {
 		return err
@@ -63,7 +65,20 @@ func Copy(srcFile, dstFile string) error {
 
 	defer in.Close()
 
-	_, err = io.Copy(out, in)
+	// Read the content of the source file into a buffer
+	buf := new(bytes.Buffer)
+	_, err = io.Copy(buf, in)
+	if err != nil {
+		return err
+	}
+
+	var retBuff []byte
+	retBuff, err = ApplyTemplate(buf.Bytes(), tmpl)
+	if err != nil {
+		return err
+	}
+
+	_, err = out.Write(retBuff)
 	if err != nil {
 		return err
 	}
@@ -89,4 +104,20 @@ func CreateIfNotExists(dir string, perm os.FileMode) error {
 	}
 
 	return nil
+}
+
+func ApplyTemplate(in []byte, tmpl interface{}) ([]byte, error) {
+	t, err := template.New("template").Parse(string(in))
+	if err != nil {
+		return nil, err
+	}
+
+	// Execute the template with the file content and write the output to the destination file
+	ret := bytes.Buffer{}
+	err = t.Execute(&ret, tmpl)
+	if err != nil {
+		return nil, err
+	}
+
+	return ret.Bytes(), nil
 }

@@ -292,7 +292,7 @@ func writeRepoContents(repo *v1alpha1.GitRepository, dstPath string, template in
 		return nil
 	}
 
-	err := util.CopyDirectory(repo.Spec.Source.Path, dstPath)
+	err := util.CopyDirectory(repo.Spec.Source.Path, dstPath, template)
 	if err != nil {
 		return fmt.Errorf("copying files: %w", err)
 	}

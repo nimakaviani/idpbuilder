@@ -1,14 +1,12 @@
 package kind
 
 import (
-	"bytes"
 	"context"
 	"embed"
 	"fmt"
 	"io/fs"
 	"os"
 	"strings"
-	"text/template"
 
 	"github.com/cnoe-io/idpbuilder/pkg/util"
 	"sigs.k8s.io/kind/pkg/cluster"
@@ -67,13 +65,8 @@ func (c *Cluster) getConfig() ([]byte, error) {
 		portMappingPairs = nil
 	}
 
-	template, err := template.New("kind.yaml").Parse(string(rawConfigTempl))
-	if err != nil {
-		return []byte{}, err
-	}
-
-	retBuff := bytes.Buffer{}
-	if err = template.Execute(&retBuff, struct {
+	var retBuff []byte
+	if retBuff, err = util.ApplyTemplate(rawConfigTempl, struct {
 		KubernetesVersion string
 		ExtraPortsMapping []PortMapping
 		Port              string
@@ -84,7 +77,8 @@ func (c *Cluster) getConfig() ([]byte, error) {
 	}); err != nil {
 		return []byte{}, err
 	}
-	return retBuff.Bytes(), nil
+
+	return retBuff, nil
 }
 
 func NewCluster(name, kubeVersion, kubeConfigPath, kindConfigPath, extraPortsMapping string, cfg util.Config) (*Cluster, error) {

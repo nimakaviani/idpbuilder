@@ -1,7 +1,6 @@
 package util
 
 import (
-	"bytes"
 	"errors"
 	"fmt"
 	"io"
@@ -9,7 +8,6 @@ import (
 	"os"
 	"path"
 	"path/filepath"
-	"text/template"
 )
 
 type FS interface {
@@ -31,18 +29,13 @@ func ConvertFSToBytes(inFS FS, name string, tmpl interface{}) ([][]byte, error) 
 			return nil, err
 		}
 
-		t, err := template.New(path.Join(name, f.Name())).Parse(string(rawResource))
-		if err != nil {
+		if returnedRawResource, err := ApplyTemplate(rawResource, tmpl); err == nil {
+			rawResources = append(rawResources, returnedRawResource)
+		} else {
 			return nil, err
 		}
-
-		returnedRawResource := bytes.Buffer{}
-		if err := t.Execute(&returnedRawResource, tmpl); err != nil {
-			return nil, err
-		}
-
-		rawResources = append(rawResources, returnedRawResource.Bytes())
 	}
+
 	return rawResources, nil
 }
 

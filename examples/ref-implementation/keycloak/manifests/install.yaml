@@ -79,9 +79,9 @@ data:
     
     # hostname configuration
     hostname=keycloak.cnoe.localtest.me
-    hostname-port=8443
+    hostname-port={{ .Port }}
     # the admin url requires its own configuration to reflect correct url
-    hostname-admin=keycloak.cnoe.localtest.me:8443
+    hostname-admin=keycloak.cnoe.localtest.me:{{ .Port }}
     # this should only be allowed in development. NEVER in production.
     hostname-strict=false
     hostname-strict-backchannel=false
