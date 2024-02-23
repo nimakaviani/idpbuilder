@@ -53,7 +53,7 @@ func NewBuild(name, port, kubeVersion, kubeConfigPath, kindConfigPath, extraPort
 
 func (b *Build) ReconcileKindCluster(ctx context.Context, recreateCluster bool) error {
 	// Initialize Kind Cluster
-	cluster, err := kind.NewCluster(b.name, b.cfg.Port, b.kubeVersion, b.kubeConfigPath, b.kindConfigPath, b.extraPortsMapping)
+	cluster, err := kind.NewCluster(b.name, b.kubeVersion, b.kubeConfigPath, b.kindConfigPath, b.extraPortsMapping, b.cfg)
 	if err != nil {
 		setupLog.Error(err, "Error Creating kind cluster")
 		return err

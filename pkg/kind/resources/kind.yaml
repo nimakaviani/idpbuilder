@@ -12,7 +12,7 @@ nodes:
         system-reserved: memory=4Gi
         node-labels: "ingress-ready=true"
   extraPortMappings:
-  - containerPort: 433
+  - containerPort: 443
     hostPort: {{ .Port }}
     protocol: TCP
   {{ range .ExtraPortsMapping }}- containerPort: {{ .ContainerPort }}

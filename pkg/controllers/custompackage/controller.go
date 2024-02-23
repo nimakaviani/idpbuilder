@@ -1,8 +1,10 @@
 package custompackage
 
 import (
+	"bytes"
 	"context"
 	"fmt"
+	"html/template"
 	"os"
 	"path/filepath"
 	"strings"
@@ -31,6 +33,7 @@ type Reconciler struct {
 	client.Client
 	Recorder record.EventRecorder
 	Scheme   *runtime.Scheme
+	Config   util.Config
 }
 
 func (r *Reconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
@@ -75,7 +78,17 @@ func (r *Reconciler) reconcileCustomPackage(ctx context.Context, resource *v1alp
 		return ctrl.Result{}, fmt.Errorf("reading file %s: %w", resource.Spec.ArgoCD.ApplicationFile, err)
 	}
 
-	objs, err := k8s.ConvertYamlToObjects(r.Scheme, b)
+	t, err := template.New(resource.Namespace + "-" + resource.Name).Parse(string(b))
+	if err != nil {
+		return ctrl.Result{}, err
+	}
+
+	returnedRawResource := bytes.Buffer{}
+	if err := t.Execute(&returnedRawResource, r.Config); err != nil {
+		return ctrl.Result{}, err
+	}
+
+	objs, err := k8s.ConvertYamlToObjects(r.Scheme, returnedRawResource.Bytes())
 	if err != nil {
 		return ctrl.Result{}, fmt.Errorf("converting yaml to object %w", err)
 	}

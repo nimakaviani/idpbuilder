@@ -10,6 +10,7 @@ import (
 	"strings"
 	"text/template"
 
+	"github.com/cnoe-io/idpbuilder/pkg/util"
 	"sigs.k8s.io/kind/pkg/cluster"
 )
 
@@ -20,7 +21,7 @@ type Cluster struct {
 	kubeConfigPath    string
 	kindConfigPath    string
 	extraPortsMapping string
-	port              string
+	cfg               util.Config
 }
 
 type PortMapping struct {
@@ -36,16 +37,15 @@ func SplitFunc(input, sep string) []string {
 }
 func (c *Cluster) getConfig() ([]byte, error) {
 
+	var rawConfigTempl []byte
+	var err error
+
 	if c.kindConfigPath != "" {
-		f, err := os.ReadFile(c.kindConfigPath)
-		if err != nil {
-			return []byte{}, err
-		} else {
-			return f, nil
-		}
+		rawConfigTempl, err = os.ReadFile(c.kindConfigPath)
+	} else {
+		rawConfigTempl, err = fs.ReadFile(configFS, "resources/kind.yaml")
 	}
 
-	rawConfigTempl, err := fs.ReadFile(configFS, "resources/kind.yaml")
 	if err != nil {
 		return []byte{}, err
 	}
@@ -80,14 +80,14 @@ func (c *Cluster) getConfig() ([]byte, error) {
 	}{
 		KubernetesVersion: c.kubeVersion,
 		ExtraPortsMapping: portMappingPairs,
-		Port:              c.port,
+		Port:              c.cfg.Port,
 	}); err != nil {
 		return []byte{}, err
 	}
 	return retBuff.Bytes(), nil
 }
 
-func NewCluster(name, port, kubeVersion, kubeConfigPath, kindConfigPath, extraPortsMapping string) (*Cluster, error) {
+func NewCluster(name, kubeVersion, kubeConfigPath, kindConfigPath, extraPortsMapping string, cfg util.Config) (*Cluster, error) {
 	provider := cluster.NewProvider(cluster.ProviderWithDocker())
 
 	return &Cluster{
@@ -96,8 +96,8 @@ func NewCluster(name, port, kubeVersion, kubeConfigPath, kindConfigPath, extraPo
 		kindConfigPath:    kindConfigPath,
 		kubeVersion:       kubeVersion,
 		kubeConfigPath:    kubeConfigPath,
-		port:              port,
 		extraPortsMapping: extraPortsMapping,
+		cfg:               cfg,
 	}, nil
 }
 
