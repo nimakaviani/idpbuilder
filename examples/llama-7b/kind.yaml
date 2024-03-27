@@ -1,0 +1,19 @@
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+nodes:
+- role: control-plane
+  image: "kindest/node:v1.27.3"
+  kubeadmConfigPatches:
+  - |
+    kind: InitConfiguration
+    nodeRegistration:
+      kubeletExtraArgs:
+        system-reserved: memory=16Gi
+        node-labels: "ingress-ready=true"
+  extraMounts:
+    - hostPath: /tmp/storage # replace with your own path
+      containerPath: /storage
+  extraPortMappings:
+  - containerPort: 443
+    hostPort: {{ .Port }}
+    protocol: TCP

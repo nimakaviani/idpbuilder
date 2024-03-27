@@ -1,0 +1,16 @@
+# Source: ialacol/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: ialacol
+  namespace: "default"
+spec:
+  selector:
+    app.kubernetes.io/instance: ialacol
+    app.kubernetes.io/name: ialacol
+  type: "ClusterIP"
+  ports:
+    - protocol: TCP
+      port: 8000
+      targetPort: 8000
+      name: http

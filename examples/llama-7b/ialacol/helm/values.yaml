@@ -1,0 +1,14 @@
+replicas: 1
+deployment:
+  image: quay.io/chenhunghan/ialacol:latest
+  env:
+    DEFAULT_MODEL_HG_REPO_ID: TheBloke/Llama-2-7B-chat-GGML
+    DEFAULT_MODEL_FILE: llama-2-7b-chat.ggmlv3.q4_0.bin
+    DEFAULT_MODEL_META: ""
+    THREADS: 8
+    BATCH_SIZE: 8
+    CONTEXT_LENGTH: 1024
+service:
+  type: ClusterIP
+  port: 8000
+  annotations: {}

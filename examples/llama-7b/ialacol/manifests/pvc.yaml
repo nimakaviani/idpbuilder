@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: ialacol-model
+spec:
+  accessModes: [ReadWriteOnce]
+  storageClass: standard
+  capacity:
+    storage: 30Gi
+  volumeMode: Filesystem
+  hostPath:
+    path: /storage
+  claimRef:
+    name: ialacol-model
+    namespace: default
+---
+# Source: ialacol/templates/pvc-model.yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ialacol-model
+  namespace: "default"
+spec:
+  accessModes: [ReadWriteOnce]
+  volumeName: ialacol-model
+  resources:
+    requests:
+      storage: "24Gi"

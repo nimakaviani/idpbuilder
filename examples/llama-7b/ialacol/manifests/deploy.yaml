@@ -1,0 +1,74 @@
+# Source: ialacol/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ialacol
+  namespace: "default"
+  labels:
+    app.kubernetes.io/instance: ialacol
+    app.kubernetes.io/name: ialacol
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: ialacol
+      app.kubernetes.io/name: ialacol
+  replicas: 1
+  template:
+    metadata:
+      name: ialacol
+      labels:
+        app.kubernetes.io/instance: ialacol
+        app.kubernetes.io/name: ialacol
+    spec:
+      containers:
+        - name: ialacol
+          image: quay.io/chenhunghan/ialacol:latest
+          resources:
+            {}
+          env:
+          - name: DEFAULT_MODEL_HG_REPO_ID
+            value: "TheBloke/Llama-2-7B-chat-GGML"
+          - name: DEFAULT_MODEL_HG_REPO_REVISION
+            value: 
+          - name: DEFAULT_MODEL_FILE
+            value: "llama-2-7b-chat.ggmlv3.q4_0.bin"
+          - name: MODE_TYPE
+            value: 
+          - name: LOGGING_LEVEL
+            value: 
+          - name: TOP_K
+            value: 
+          - name: TOP_P
+            value: 
+          - name: TEMPERATURE
+            value: 
+          - name: REPETITION_PENALTY
+            value: 
+          - name: LAST_N_TOKENS
+            value: 
+          - name: SEED
+            value: 
+          - name: BATCH_SIZE
+            value: "8"
+          - name: THREADS
+            value: "8"
+          - name: MAX_TOKENS
+            value: 
+          - name: STOP
+            value: 
+          - name: CONTEXT_LENGTH
+            value: "1024"
+          - name: GPU_LAYERS
+            value: 
+          - name: TRUNCATE_PROMPT_LENGTH
+            value: 
+          volumeMounts:
+          - mountPath: /app/models
+            name: model
+      volumes:
+      - name: model
+        persistentVolumeClaim:
+          claimName: ialacol-model
+      tolerations:
+      nodeSelector:
+      affinity:

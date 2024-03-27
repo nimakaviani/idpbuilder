@@ -1,0 +1,33 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: ialacol
+  namespace: argocd
+  labels:
+    env: dev
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  sources:
+    # - repoURL: 'https://chenhunghan.github.io/ialacol'
+    #   targetRevision: 0.15.0
+    #   helm:
+    #     releaseName: llama-2-7b-chat 
+    #     valueFiles:
+    #       - $values/helm/values.yaml
+    #   chart: ialacol
+    # - repoURL: cnoe://ialacol
+    #   targetRevision: HEAD
+    #   ref: values
+    - repoURL: cnoe://ialacol
+      targetRevision: HEAD
+      path: "manifests"
+  destination:
+    server: "https://kubernetes.default.svc"
+    namespace: ialacol
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
+    automated:
+      selfHeal: true
