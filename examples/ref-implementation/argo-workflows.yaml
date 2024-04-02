@@ -10,9 +10,9 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: cnoe://argo-workflows/manifests
-    targetRevision: HEAD
-    path: "dev"
+    repoURL: https://github.com/nimakaviani/idpbuilder
+    targetRevision: common-ref
+    path: "examples/ref-implementation/argo-workflows/manifests/dev"
   destination:
     server: "https://kubernetes.default.svc"
     namespace: argo

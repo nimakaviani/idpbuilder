@@ -10,9 +10,9 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: cnoe://crossplane-compositions/manifests
-    targetRevision: HEAD
-    path: "."
+    repoURL: https://github.com/nimakaviani/idpbuilder
+    targetRevision: common-ref
+    path: "examples/ref-implementation/crossplane-compositions/manifests"
     directory:
       recurse: true
   destination:

@@ -10,9 +10,9 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: cnoe://crossplane-providers
-    targetRevision: HEAD
-    path: "."
+    repoURL: https://github.com/nimakaviani/idpbuilder
+    targetRevision: common-ref
+    path: "examples/ref-implementation/crossplane-providers"
   destination:
     server: "https://kubernetes.default.svc"
     namespace: crossplane-system

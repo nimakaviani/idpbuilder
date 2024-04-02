@@ -8,9 +8,9 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: cnoe://backstage-templates/entities
-    targetRevision: HEAD
-    path: "."
+    repoURL: https://github.com/nimakaviani/idpbuilder
+    targetRevision: common-ref
+    path: "examples/ref-implementation/backstage-templates/entities"
     directory:
       exclude: 'catalog-info.yaml'
   destination:

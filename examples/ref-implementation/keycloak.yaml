@@ -10,9 +10,9 @@ spec:
     namespace: keycloak
     server: "https://kubernetes.default.svc"
   source:
-    repoURL: cnoe://keycloak/manifests
-    targetRevision: HEAD
-    path: "."
+    repoURL: https://github.com/nimakaviani/idpbuilder
+    targetRevision: common-ref
+    path: "examples/ref-implementation/keycloak/manifests"
   project: default
   syncPolicy:
     automated:
