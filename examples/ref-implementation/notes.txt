@@ -1,0 +1,8 @@
+# Observations on consolidation
+
+- needs to have the DNS name configurable
+- has some strong dependencies to gitea that need to be pulled out 
+  - how can we do this in relation to other git repositories needs to be determined
+- assumes nginx installation (the ref implementation can drop the nginx stuff in)
+- needs CSI driver if we want to work with EBS blocks to install posgtress
+  - this requires podIdentity or IRSA enabled for EBS blocks
