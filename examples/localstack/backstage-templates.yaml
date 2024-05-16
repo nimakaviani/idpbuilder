@@ -1,0 +1,26 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: backstage-templates
+  namespace: argocd
+  labels:
+    env: dev
+spec:
+  project: default
+  sources:
+  - repoURL: https://github.com/cnoe-io/idpbuilder
+    targetRevision: HEAD
+    path: "examples/ref-implementation/backstage-templates/entities"
+  - repoURL: cnoe://backstage-templates/entities
+    targetRevision: HEAD
+    path: "."
+    directory:
+      exclude: 'catalog-info.yaml'
+  destination:
+    server: "https://kubernetes.default.svc"
+    namespace: backstage
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
+    automated:
+      selfHeal: true
